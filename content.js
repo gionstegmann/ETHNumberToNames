@@ -33,9 +33,14 @@ function walkDOM(node, nameStyle, addBrackets) {
     }
 }
 
-chrome.storage.local.get(['nameStyle', 'addBrackets'], (data) => {
+chrome.storage.local.get(['nameStyle', 'addBrackets', 'isEnabled'], (data) => {
     const nameStyle = data.nameStyle || 'full'; // Default to 'full' if not set
     const addBrackets = data.addBrackets || false;
+
+    if (!data.isEnabled) {
+        console.log('Extension is disabled');
+        return; // Exit early if the extension is disabled
+    }
 
     // Modify the walkDOM call to pass these settings
     walkDOM(document.body, nameStyle, addBrackets);
