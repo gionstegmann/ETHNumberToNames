@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "ETH Course Number to Text",
+    "name": "ETH Zurich Course Number to Text",
     "version": "1.0",
-    "description": "Replace course Numbers with their actual names on web pages.",
+    "description": "Replace ETH Zurich course numbers with their actual names on web pages.",
     "permissions": [
         "storage",
         "activeTab"
