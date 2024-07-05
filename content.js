@@ -39,14 +39,25 @@ function replaceCourseCodes(textNode, nameStyle, addBrackets) {
 
 function walkDOM(node, nameStyle, addBrackets) {
     if (node.nodeType === 3) { // Text node
+        let parent = node.parentNode;
+        // Ensure the parent node exists before accessing its properties
+        if (!parent) {
+            console.log('Skipping a detached or root-level text node:', node);
+            return; // Exit if no parent is found
+        }
+        // Check if the parent node should be skipped
+        if (parent.isContentEditable || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA' || parent.classList.contains('ignore-class')) {
+            return; // Skip modifying text nodes within editable contexts
+        }
         replaceCourseCodes(node, nameStyle, addBrackets);
     }
-    node = node.firstChild;
-    while (node) {
-        walkDOM(node, nameStyle, addBrackets);
-        node = node.nextSibling;
+    let child = node.firstChild;
+    while (child) {
+        walkDOM(child, nameStyle, addBrackets);
+        child = child.nextSibling;
     }
 }
+
 
 chrome.storage.local.get(['nameStyle', 'addBrackets', 'isEnabled'], (data) => {
     const nameStyle = data.nameStyle || 'full'; // Default to 'full' if not set
@@ -65,10 +76,11 @@ chrome.storage.local.get(['nameStyle', 'addBrackets', 'isEnabled'], (data) => {
         mutations.forEach(mutation => {
             if (mutation.type === 'childList') {
                 mutation.addedNodes.forEach(node => {
-                    walkDOM(node, nameStyle, addBrackets);
+                        walkDOM(node, nameStyle, addBrackets);
                 });
             }
         });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    });    
+    observer.observe(document.body, { childList: true, subtree: true, characterData: false });
+
 });
